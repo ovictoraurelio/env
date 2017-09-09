@@ -29,7 +29,10 @@ function error {
 }
 function settings {	
 	wht=$(tput sgr0);red=$(tput setaf 1);gre=$(tput setaf 2);yel=$(tput setaf 3);blu=$(tput setaf 4);
-	mkdir $HOME/apps
+	if [ ! -d $HOME/apps ]; then 
+		doing "Creating apps folder"
+		mkdir $HOME/apps
+	fi
 	DIR=$HOME/apps
 }
 function telegram {
@@ -48,13 +51,51 @@ function code {
 	wget -O $DIR/code.tar.gz https://go.microsoft.com/fwlink/?LinkID=620884
 	mkdir ~/apps/code	
 	tar -vzxf $DIR/code.tar.gz --strip 1 -C $DIR/code
-	doing "Executing vs code"
+	doing "Adding settings"
+	configCode
+	doing "Executing vs code"	
 	$DIR/code/code
 	finished "VS Code successfully installed\n"
+}
+function configCode {
+	cat << EOF > $HOME/.config/Code/User/settings.json	
+{
+    "files.autoSave": "off",
+    "workbench.colorTheme": "Northem Dark",
+    "workbench.iconTheme": "material-icon-theme",
+    "sync.gist": "47639fa50f09b6dc7d21d33dc7922860",
+    "sync.lastUpload": "2017-09-09T00:50:26.952Z",
+    "sync.autoDownload": true,
+    "sync.autoUpload": false,
+    "sync.lastDownload": "2017-09-09T00:40:19.423Z",
+    "sync.forceDownload": false,
+    "sync.anonymousGist": false,
+    "sync.host": "",
+    "sync.pathPrefix": "",
+    "sync.quietSync": false,
+    "sync.askGistName": false,                      
+    "workbench.activityBar.visible": true,
+    "files.associations": {
+        "*.twig": "html",
+        "*.html": "twig"
+    },
+    "extensions.ignoreRecommendations": false,
+    "window.zoomLevel": 0
+}
+EOF
+	cat << EOF > $HOME/.config/Code/User/keybindings.json	
+[
+    { "key": "ctrl+\\",               "command": "workbench.action.toggleSidebarVisibility" },
+    { "key": "ctrl+k ctrl+up",        "command": "workbench.action.splitEditor" },
+    { "key": "ctrl+t",                "command": "workbench.action.quickOpen" },
+    { "key": "ctrl+e",                "command": "workbench.action.showAllSymbols" },
+    { "key": "ctrl+j", 				  "command": "workbench.action.terminal.toggleTerminal" }
+]
+EOF
 }
 function MAIN {	
 	settings
 	telegram
-	code
+	code	
 }
 MAIN
