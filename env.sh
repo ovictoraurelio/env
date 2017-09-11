@@ -57,6 +57,10 @@ function code {
 	$DIR/code/code
 	finished "VS Code successfully installed\n"
 }
+function backgroundImage {
+    wget -O $DIR/background.jpg http://cin.ufpe.br/~vags/tardis_wallpaper.jpg
+    gsettings set org.gnome.desktop.background picture-uri file://$DIR/background.jpg
+}
 function configCode {
 	cat << EOF > $HOME/.config/Code/User/settings.json	
 {
@@ -95,6 +99,7 @@ EOF
 }
 function MAIN {	
 	settings
+    backgroundImage
 	telegram
 	code	
 }
