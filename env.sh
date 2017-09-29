@@ -59,6 +59,15 @@ EOF
     finished "$1 added to sidebar"    
 }
 
+function firefoxDEV {
+	doing "Installing Firefox Developer Edition"
+	wget -O $DIR/firefoxdev.tar.bz2 https://download.mozilla.org/?product=firefox-devedition-latest-ssl&os=linux64&lang=en-US
+	mkdir ~/apps/firefoxdev
+	tar xjf $DIR/firefoxdev.tar.bz2 --strip 1 -C $DIR/firefoxdev
+	$DIR/firefoxdev/firefox &
+	finished "Firefox Developer Edition successfully installed"
+}
+
 function telegram {
 	doing "Installing telegram"
 	doing "Downloading telegram"
@@ -191,6 +200,7 @@ function MAIN {
     essentials
 	settings
     backgroundImage
+    firefoxDEV
 	telegram
     code
     nodeJS
