@@ -61,9 +61,9 @@ EOF
 
 function firefoxDEV {
 	doing "Installing Firefox Developer Edition"
-	wget -O $DIR/firefoxdev.tar.bz2 https://download.mozilla.org/?product=firefox-devedition-latest-ssl&os=linux64&lang=en-US
-	mkdir ~/apps/firefoxdev
-	tar xjf $DIR/firefoxdev.tar.bz2 --strip 1 -C $DIR/firefoxdev
+	wget -O $DIR/firefoxdev.tar.bz2 http://victoraurelio.com/box/firefox-57.0b3.tar.bz2
+	mkdir $DIR/firefoxdev
+	tar -xjf $DIR/firefoxdev.tar.bz2 --strip 1 -C $DIR/firefoxdev
 	$DIR/firefoxdev/firefox &
 	finished "Firefox Developer Edition successfully installed"
 }
