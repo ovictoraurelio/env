@@ -41,11 +41,11 @@ function backgroundImage {
     wget -O $DIR/background.jpg http://cin.ufpe.br/~vags/tardis_wallpaper.jpg
     gsettings set org.gnome.desktop.background picture-uri file://$DIR/background.jpg
 }
-function addShortcut {
+function addShortcut {    
     doing "adding shortcut for $1"
     
     gtk-update-icon-cache -f $HOME/.local/share/icons/hicolor >/dev/null 2>&1
-	desktop-file-install --dir=$HOME/.local/share/applications "$HOME/.local/share/applications/$1"
+	desktop-file-install --dir $HOME/.local/share/applications/ "$HOME/.local/share/applications/$1"
     
     favorites=$(
 python << EOF
@@ -56,16 +56,34 @@ EOF
 )
     gsettings set com.canonical.Unity.Launcher favorites "$favorites"
     
-    finished "$1 added to sidebar"    
+    finished "$1 added to sidebar\n"    
 }
 
 function firefoxDEV {
 	doing "Installing Firefox Developer Edition"
-	wget -O $DIR/firefoxdev.tar.bz2 https://download.mozilla.org/?product=firefox-devedition-latest-ssl&os=linux64&lang=en-US
-	mkdir ~/apps/firefoxdev
-	tar xjf $DIR/firefoxdev.tar.bz2 --strip 1 -C $DIR/firefoxdev
+	wget -O $DIR/firefoxdev.tar.bz2 http://victoraurelio.com/box/firefox-57.0b3.tar.bz2
+	mkdir $DIR/firefoxdev
+	tar -xjf $DIR/firefoxdev.tar.bz2 --strip 1 -C $DIR/firefoxdev
 	$DIR/firefoxdev/firefox &
 	finished "Firefox Developer Edition successfully installed"
+}
+
+function configFirefoxDEV {    
+cat << EOF > $HOME/.local/share/applications/firefoxdev.desktop
+[Desktop Entry]
+Encoding=UTF-8
+Version=1.0
+Type=Application
+Name=Firefox Developer
+Icon=$DIR/firefoxdev/browser/icons/mozicon128.png
+Path=$DIR/firefoxdev
+Exec=$DIR/firefoxdev/firefox
+StartupNotify=false
+StartupWMClass=Firefox
+OnlyShowIn=Unity;
+X-UnityGenerated=true
+EOF
+    addShortcut firefoxdev.desktop
 }
 
 function telegram {
@@ -99,9 +117,9 @@ function copy {
 function nodeJS {    
     doing "installing Node.js...\n"
     wget -O $DIR/node.txz https://nodejs.org/dist/v6.11.3/node-v6.11.3-linux-x64.tar.xz     
-    pv -n $DIR/node.txz  | tar -xJf - -C $DIR/apps/node/ 
-    copy "Node.js (part 1/4)" $DIR/apps/node/*/bin $HOME/teste
-    copy "Node.js (part 2/4)" $DIR/apps/node/*/include $HOME/teste
+    pv -n $DIR/node.txz  | tar -xJf - -C $DIR/node/ 
+    copy "Node.js (part 1/4)" $DIR/node/*/bin $HOME/teste
+    copy "Node.js (part 2/4)" $DIR/node/*/include $HOME/teste
     copy "Node.js (part 3/4)" /tmp/node*/lib $HOME/.local
     copy "Node.js (part 4/4)" /tmp/node*/share $HOME/.local
 
@@ -109,37 +127,35 @@ function nodeJS {
 }
 
 function configTelegram {
-    cat << EOF > $HOME/.local/share/applications/telegram.desktop
+cat << EOF > $HOME/.local/share/applications/telegram.desktop
 [Desktop Entry]
+Encoding=UTF-8
 Version=1.0
-Name=Telegram D
-Comment= desktop version of Telegram app
-TryExec=$DIR/telegram/Telegram
-Exec=$DIR/telegram/Telegram -- %u
-Icon=telegram
-Terminal=false
-StartupWMClass=TelegramDesktop
 Type=Application
-Categories=Network;InstantMessaging;Qt;
-MimeType=x-scheme-handler/tg;
-X-Desktop-File-Install-Version=0.22
-EOF 
+Name=Telegram 
+Icon=telegram
+Path=$DIR/telegram/
+Exec=$DIR/telegram/Telegram
+StartupNotify=false
+StartupWMClass=Telegram
+OnlyShowIn=Unity;
+X-UnityGenerated=true
+EOF
     addShortcut telegram.desktop
 }
 
 
-function configCode {
-	cat << EOF > $HOME/.config/Code/User/settings.json	
-// Place your settings in this file to overwrite the default settings
+function configCode {    
+cat << EOF > $HOME/.config/Code/User/settings.json	
 {
     "files.autoSave": "off",
     "workbench.colorTheme": "Northem Dark",
     "workbench.iconTheme": "material-icon-theme",
     "sync.gist": "47639fa50f09b6dc7d21d33dc7922860",
-    "sync.lastUpload": "2017-01-13T11:38:00.848Z",
+    "sync.lastUpload": "2017-09-20T12:01:35.443Z",
     "sync.autoDownload": true,
     "sync.autoUpload": false,
-    "sync.lastDownload": "2017-01-13T11:38:00.848Z",
+    "sync.lastDownload": "2017-09-14T18:56:08.370Z",
     "sync.forceDownload": false,
     "sync.anonymousGist": false,
     "sync.host": "",
@@ -157,35 +173,37 @@ function configCode {
     "workbench.quickOpen.closeOnFocusLost": false
 }
 EOF
-    addShortcut code.desktop
-	cat << EOF > $HOME/.config/Code/User/keybindings.json	
-// Empty
+
+cat << EOF > $HOME/.config/Code/User/keybindings.json	
 [
-    { "key": "ctrl+\\\\",                 "command": "workbench.action.toggleSidebarVisibility" },
+    { "key": "ctrl+\\\\",               "command": "workbench.action.toggleSidebarVisibility" },
     { "key": "ctrl+k ctrl+up",          "command": "workbench.action.splitEditor" },
     { "key": "ctrl+t",                  "command": "workbench.action.quickOpen" },
     { "key": "ctrl+e",                  "command": "workbench.action.showAllSymbols" },
     { "key": "ctrl+j",                  "command": "workbench.action.terminal.toggleTerminal" },
     { "key": "ctrl+shift+i",            "command": "HookyQR.beautifyFile"},
-    { "key": "ctrl+shift+c",          "command": "editor.action.blockComment"}
+    { "key": "ctrl+shift+c",            "command": "editor.action.blockComment"}
 ]
 EOF
-    cat << EOF > $HOME/.local/share/applications/code.desktop
+
+cat << EOF > $HOME/.local/share/applications/code.desktop
 [Desktop Entry]
+Encoding=UTF-8
 Version=1.0
-Name=code
-Comment=Text Editor VS Code
-TryExec=$DIR/code/code
-Exec=$DIR/code/code 
-Icon=code
-Terminal=false
-StartupWMClass=VSCode
 Type=Application
-Categories=Development;IDE;
-MimeType=x-scheme-handler/tg;
-X-Desktop-File-Install-Version=0.22
+Name=Code 
+Icon=visualstudiocode
+Path=$DIR/code/
+Exec=$DIR/code/code
+StartupNotify=false
+StartupWMClass=Code
+OnlyShowIn=Unity;
+X-UnityGenerated=true
 EOF
+
+    addShortcut code.desktop
 }
+
 
 function essentials {
     wht=$(tput sgr0);red=$(tput setaf 1);gre=$(tput setaf 2);yel=$(tput setaf 3);blu=$(tput setaf 4);
@@ -201,8 +219,11 @@ function MAIN {
 	settings
     backgroundImage
     firefoxDEV
+    configFirefoxDEV
 	telegram
+    configTelegram
     code
-    nodeJS
+    configCode
+    nodeJS    
 }
 MAIN
