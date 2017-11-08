@@ -40,6 +40,7 @@ EOF
 function backgroundImage {
     wget -O $DIR/background.jpg http://cin.ufpe.br/~vags/tardis_wallpaper.jpg
     gsettings set org.gnome.desktop.background picture-uri file://$DIR/background.jpg
+     gsettings set com.canonical.unity-greeter background "$DIR/background.jpg"
 }
 function addShortcut {    
     doing "adding shortcut for $1"
