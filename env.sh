@@ -36,6 +36,8 @@ array = eval("$(gsettings get com.canonical.Unity.Launcher favorites)")
 print(str(array[:3] + array[8:]))
 EOF
 )"	
+    gsettings set org.compiz.core:/org/compiz/profiles/unity/plugins/core/ hsize 2
+    gsettings set org.compiz.core:/org/compiz/profiles/unity/plugins/core/ vsize 2
 }
 function backgroundImage {
     wget -O $DIR/background.jpg http://cin.ufpe.br/~vags/tardis_wallpaper.jpg
