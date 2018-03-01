@@ -116,19 +116,6 @@ function code {
 function copy {
     ( cp -fRv ${@:2} | pv -elnps $(find ${@:2:(( $# - 2 ))} | wc -l) ) 2>&1 | whiptail --title "Extracting" --gauge "\nStatus complete$1..." 0 0 0
 }
-
-function nodeJS {    
-    doing "installing Node.js...\n"
-    wget -O $DIR/node.txz https://nodejs.org/dist/v6.11.3/node-v6.11.3-linux-x64.tar.xz     
-    pv -n $DIR/node.txz  | tar -xJf - -C $DIR/node/ 
-    copy "Node.js (part 1/4)" $DIR/node/*/bin $HOME/teste
-    copy "Node.js (part 2/4)" $DIR/node/*/include $HOME/teste
-    copy "Node.js (part 3/4)" /tmp/node*/lib $HOME/.local
-    copy "Node.js (part 4/4)" /tmp/node*/share $HOME/.local
-
-    finished "Node.js installed successfully!"
-}
-
 function configTelegram {
 cat << EOF > $HOME/.local/share/applications/telegram.desktop
 [Desktop Entry]
@@ -208,6 +195,43 @@ EOF
 }
 
 
+function installNvm {
+  if [ -a $HOME/.nvm ]; then
+    doing nvm
+  else
+    doing nvm
+    wget -qO- https://raw.githubusercontent.com/creationix/nvm/master/install.sh | bash
+    . ~/.nvm/nvm.sh
+    finished nvm
+  fi
+}
+
+function installNode {
+  node -v &>/dev/null
+  if [ $? == "0" ]; then
+    doing node
+  else
+    doing node
+    nvm install stable
+    nvm use stable
+    nvm alias default stable
+    finished node
+  fi
+}
+
+function installPm2 {
+  pm2 &>/dev/null
+  if [ $? == "1" ]; then
+    doing PM2
+  else
+    doing PM2
+    npm install -g pm2@latest
+    . ~/.nvm/nvm.sh
+    pm2 update
+    finished PM2
+  fi
+}
+
 function essentials {
     wht=$(tput sgr0);red=$(tput setaf 1);gre=$(tput setaf 2);yel=$(tput setaf 3);blu=$(tput setaf 4);
     if [ ! -d $HOME/apps ]; then 
@@ -219,14 +243,17 @@ function essentials {
 
 function MAIN {	
     essentials
-	settings
+    settings
     backgroundImage
     firefoxDEV
     configFirefoxDEV
-	telegram
+    telegram
     configTelegram
     code
     configCode
-    nodeJS    
+    nodeJS
+    installNvm
+    installNode
+    installPm2
 }
 MAIN
