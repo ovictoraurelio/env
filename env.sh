@@ -29,6 +29,9 @@ function error {
 }
 function settings {	
     chmod 700 $HOME    
+    # alt - tab don't change between workspaces
+    gsettings set org.gnome.shell.app-switcher current-workspace-only true
+    # removing from launcher default applicatoins
     gsettings reset com.canonical.Unity.Launcher favorites
     gsettings set com.canonical.Unity.Launcher favorites "$(
 python << EOF
@@ -112,6 +115,26 @@ function code {
 }
 function copy {
     ( cp -fRv ${@:2} | pv -elnps $(find ${@:2:(( $# - 2 ))} | wc -l) ) 2>&1 | whiptail --title "Extracting" --gauge "\nStatus complete$1..." 0 0 0
+}
+function postman {
+    doing "Installing postman"
+    wget -O $DIR/postman.tar.gz https://dl.pstmn.io/download/latest/linux64 
+    mkdir ~/apps/postman
+    tar -xzf $DIR/postman.tar.gz -C $DIR/postman 
+    configPostman 
+    finished "Postman successfully installed\n"       
+}
+function configPostman {
+    cat >  $HOME/.local/share/applications/postman.desktop <<EOL
+[Desktop Entry]
+Encoding=UTF-8
+Name=Postman
+Exec=postman
+Icon=   
+Terminal=false
+Type=Application
+Categories=Development;
+EOL
 }
 
 function nodeJS {    
@@ -216,14 +239,15 @@ function essentials {
 
 function MAIN {	
     essentials
-	settings
+    settings
     backgroundImage
     firefoxDEV
     configFirefoxDEV
-	telegram
+    telegram
     configTelegram
     code
     configCode
-    nodeJS    
+    nodeJS
+    postman    
 }
 MAIN
