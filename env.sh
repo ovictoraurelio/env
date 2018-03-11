@@ -39,10 +39,13 @@ array = eval("$(gsettings get com.canonical.Unity.Launcher favorites)")
 print(str(array[:3] + array[8:]))
 EOF
 )"	
+    gsettings set org.compiz.core:/org/compiz/profiles/unity/plugins/core/ hsize 2
+    gsettings set org.compiz.core:/org/compiz/profiles/unity/plugins/core/ vsize 2
 }
 function backgroundImage {
     wget -O $DIR/background.jpg http://cin.ufpe.br/~vags/tardis_wallpaper.jpg
     gsettings set org.gnome.desktop.background picture-uri file://$DIR/background.jpg
+     gsettings set com.canonical.unity-greeter background "$DIR/background.jpg"
 }
 function addShortcut {    
     doing "adding shortcut for $1"
@@ -64,10 +67,11 @@ EOF
 
 function firefoxDEV {
 	doing "Installing Firefox Developer Edition"
-	wget -O $DIR/firefoxdev.tar.bz2 http://victoraurelio.com/box/firefox-57.0b3.tar.bz2
+	wget -O $DIR/firefoxdev.tar.bz2 https://download.mozilla.org/?product=firefox-devedition-latest-ssl&os=linux64&lang=en-US
 	mkdir $DIR/firefoxdev
 	tar -xjf $DIR/firefoxdev.tar.bz2 --strip 1 -C $DIR/firefoxdev
 	$DIR/firefoxdev/firefox &
+    configFirefoxDEV
 	finished "Firefox Developer Edition successfully installed"
 }
 
@@ -80,7 +84,7 @@ Type=Application
 Name=Firefox Developer
 Icon=$DIR/firefoxdev/browser/icons/mozicon128.png
 Path=$DIR/firefoxdev
-Exec=$DIR/firefoxdev/firefox
+Exec=$DIR/firefoxdev/firefox %u
 StartupNotify=false
 StartupWMClass=Firefox
 OnlyShowIn=Unity;
@@ -135,18 +139,6 @@ Terminal=false
 Type=Application
 Categories=Development;
 EOL
-}
-
-function nodeJS {    
-    doing "installing Node.js...\n"
-    wget -O $DIR/node.txz https://nodejs.org/dist/v6.11.3/node-v6.11.3-linux-x64.tar.xz     
-    pv -n $DIR/node.txz  | tar -xJf - -C $DIR/node/ 
-    copy "Node.js (part 1/4)" $DIR/node/*/bin $HOME/teste
-    copy "Node.js (part 2/4)" $DIR/node/*/include $HOME/teste
-    copy "Node.js (part 3/4)" /tmp/node*/lib $HOME/.local
-    copy "Node.js (part 4/4)" /tmp/node*/share $HOME/.local
-
-    finished "Node.js installed successfully!"
 }
 
 function configTelegram {
@@ -228,6 +220,43 @@ EOF
 }
 
 
+function installNvm {
+  if [ -a $HOME/.nvm ]; then
+    doing nvm
+  else
+    doing nvm
+    wget -qO- https://raw.githubusercontent.com/creationix/nvm/master/install.sh | bash
+    . ~/.nvm/nvm.sh
+    finished nvm
+  fi
+}
+
+function installNode {
+  node -v &>/dev/null
+  if [ $? == "0" ]; then
+    doing node
+  else
+    doing node
+    nvm install stable
+    nvm use stable
+    nvm alias default stable
+    finished node
+  fi
+}
+
+function installPm2 {
+  pm2 &>/dev/null
+  if [ $? == "1" ]; then
+    doing PM2
+  else
+    doing PM2
+    npm install -g pm2@latest
+    . ~/.nvm/nvm.sh
+    pm2 update
+    finished PM2
+  fi
+}
+
 function essentials {
     wht=$(tput sgr0);red=$(tput setaf 1);gre=$(tput setaf 2);yel=$(tput setaf 3);blu=$(tput setaf 4);
     if [ ! -d $HOME/apps ]; then 
@@ -241,13 +270,19 @@ function MAIN {
     essentials
     settings
     backgroundImage
-    firefoxDEV
-    configFirefoxDEV
-    telegram
-    configTelegram
-    code
-    configCode
-    nodeJS
-    postman    
+    firefoxDEV    
+    telegram    
+    code    
+    postman
+    installNvm
+    installNode
+    installPm2
 }
-MAIN
+
+if [ -z "$1" ]
+  then
+    MAIN
+else
+    essentials
+    $($1)
+fi
