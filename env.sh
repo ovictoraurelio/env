@@ -258,31 +258,38 @@ function installPm2 {
 }
 
 function essentials {
-    wht=$(tput sgr0);red=$(tput setaf 1);gre=$(tput setaf 2);yel=$(tput setaf 3);blu=$(tput setaf 4);
-    if [ ! -d $HOME/apps ]; then 
-        doing "Creating apps folder"
-        mkdir $HOME/apps
+    DIR=/tmp/apps
+    if [ "$1" == "home" ]; then 
+        DIR=$HOME/apps
     fi
-    DIR=$HOME/apps
+    wht=$(tput sgr0);red=$(tput setaf 1);gre=$(tput setaf 2);yel=$(tput setaf 3);blu=$(tput setaf 4);
+    if [ ! -d $DIR ]; then 
+        doing "Creating apps folder"
+        mkdir $DIR
+    fi    
 }
 
 function MAIN {	
     essentials
     settings
     backgroundImage
-    firefoxDEV    
-    telegram    
-    code    
+    telegram
+    firefoxDEV
+    code
     postman
     installNvm
     installNode
     installPm2
 }
 
-if [ -z "$1" ]
-  then
-    MAIN
+if [ -z "$1" ]; then
+    MAIN        
 else
-    essentials
-    $($1)
+    if [ -z "$2" ]; then
+        essentials
+        $($1)
+    else
+        essentials $1
+        $($2)
+    fi
 fi
